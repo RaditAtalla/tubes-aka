@@ -36,13 +36,6 @@ export default function Home() {
                             <i>print a list of all folder at root level</i>
                         </li>
                         <li>
-                            list [folder_name] -{" "}
-                            <i>
-                                print a list of folder inside the specified
-                                folder
-                            </i>
-                        </li>
-                        <li>
                             sortDesc - <i>sort the list in descending order</i>
                         </li>
                         <li>

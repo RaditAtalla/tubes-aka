@@ -1,47 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Terminal({
     settings,
 }: {
     settings: { depth: number; childCount: number };
 }) {
-    const [history, setHistory] = useState<{
-        commands: string[];
-        results: string[];
-    }>({ commands: [], results: [] });
     const [input, setInput] = useState("");
+    const [folder, setFolder] = useState<string[]>([]);
+    const [history, setHistory] = useState<(string | string[])[]>([]);
 
-    function addHistory(input: string, data: any) {
-        if (input != "" && data) {
-            setHistory((prev) => ({
-                commands: [...prev.commands, input],
-                results: [...prev.results, data],
-            }));
-            setInput("");
+    useEffect(() => {
+        const temp = [];
+        for (let i = 1; i <= settings.childCount; i++) {
+            temp.push("Folder " + i);
         }
-    }
 
-    function executeCommand(command: string) {
-        switch (command) {
+        setFolder(temp);
+    }, []);
+
+    function executeCommand() {
+        switch (input) {
             case "list":
-                const temp: string[] = [];
-                for (let i = 1; i <= settings.childCount; i++) {
-                    temp.push("folder " + i + " - ");
-                }
-
-                addHistory(command, temp);
-                break;
-
-            case "meow":
-                addHistory(command, "folder B");
+                setHistory((prev) => [...prev, input, folder]);
                 break;
 
             default:
-                addHistory(command, "Unknown command");
                 break;
         }
+
+        setInput("");
     }
 
     return (
@@ -50,18 +39,16 @@ export default function Terminal({
                 <h1 className="font-bold">Basic Terminal</h1>
 
                 <div className="flex flex-col gap-2">
-                    {history.commands.map((_, index) => (
-                        <div key={index}>
-                            <p>
-                                <span className="font-bold">@</span>{" "}
-                                {history.commands[index]}
-                            </p>
-                            <p key={index}>
-                                <span className="font-bold">@</span>{" "}
-                                {history.results[index]}
-                            </p>
-                        </div>
-                    ))}
+                    {/* [A, [B, C, [D, E]]] */}
+                    {history.map((item, i) => {
+                        if (typeof item != "string") {
+                            return item.map((h, j) => {
+                                return <p key={j}>{h}</p>;
+                            });
+                        } else {
+                          return <p key={i}>{item}</p>
+                        }
+                    })}
                 </div>
 
                 <div className="flex">
@@ -75,7 +62,7 @@ export default function Terminal({
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={(e) => {
-                            if (e.key == "Enter") executeCommand(input);
+                            if (e.key == "Enter") executeCommand();
                         }}
                     />
                 </div>
