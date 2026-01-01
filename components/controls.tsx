@@ -11,7 +11,6 @@ export default function Control({
 }) {
     const [depth, setDepth] = useState(1);
     const [childCount, setChildCount] = useState(2);
-    
 
     return (
         <div className="flex flex-col gap-5 flex-1">
