@@ -17,7 +17,7 @@ export default function Home() {
 
     return (
         <div className="bg-zinc-900 w-screen min-h-screen p-16 flex flex-col gap-10">
-            <Terminal settings={settings} />
+            <Terminal inputSize={inputSize} />
 
             <div className="flex justify-around flex-1">
                 <Control

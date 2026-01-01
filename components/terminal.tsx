@@ -2,28 +2,26 @@
 
 import { useEffect, useState } from "react";
 
-export default function Terminal({
-    settings,
-}: {
-    settings: { depth: number; childCount: number };
-}) {
+export default function Terminal({ inputSize }: { inputSize: number }) {
     const [input, setInput] = useState("");
     const [folder, setFolder] = useState<string[]>([]);
     const [history, setHistory] = useState<(string | string[])[]>([]);
 
     useEffect(() => {
-        const temp = [];
-        for (let i = 1; i <= settings.childCount; i++) {
-            temp.push("Folder " + i);
+        const folders = [];
+        let ascii = 65;
+        for (let i = 0; i < inputSize; i++) {
+            folders.push("Folder " + String.fromCharCode(ascii++));
         }
 
-        setFolder(temp);
-    }, []);
+        setFolder(folders);
+    }, [inputSize]);
 
     function executeCommand() {
         switch (input) {
             case "list":
                 setHistory((prev) => [...prev, input, folder]);
+                console.log(folder);
                 break;
 
             default:
@@ -46,7 +44,7 @@ export default function Terminal({
                                 return <p key={j}>{h}</p>;
                             });
                         } else {
-                          return <p key={i}>{item}</p>
+                            return <p key={i}>{item}</p>;
                         }
                     })}
                 </div>
