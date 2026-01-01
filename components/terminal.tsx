@@ -1,11 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-export default function Terminal({ inputSize }: { inputSize: number }) {
+export default function Terminal({
+    settings,
+    inputSize,
+}: {
+    settings: { depth: number; childCount: number };
+    inputSize: number;
+}) {
     const [input, setInput] = useState("");
     const [folder, setFolder] = useState<string[]>([]);
-    const [history, setHistory] = useState<(string | string[])[]>([]);
+    const [history, setHistory] = useState<string[]>([]);
 
     useEffect(() => {
         const folders = [];
@@ -20,8 +26,7 @@ export default function Terminal({ inputSize }: { inputSize: number }) {
     function executeCommand() {
         switch (input) {
             case "list":
-                setHistory((prev) => [...prev, input, folder]);
-                console.log(folder);
+                setHistory(folder);
                 break;
 
             default:
@@ -31,23 +36,27 @@ export default function Terminal({ inputSize }: { inputSize: number }) {
         setInput("");
     }
 
+    function renderTree(index: number, depth: number) {
+        if (index >= history.length) return null;
+
+        const children = Array.from({length: settings.childCount}, (_, n) => settings.childCount * index + (n + 1));
+
+        return (
+            <React.Fragment key={index}>
+                <p style={{ paddingLeft: 32 * depth }}>{history[index]}</p>
+                {children.map(childIndex => (
+                    renderTree(childIndex, depth + 1)
+                ))}
+            </React.Fragment>
+        );
+    }
+
     return (
         <div className="flex-1">
             <div className="border border-white h-full flex flex-col gap-5 p-5">
                 <h1 className="font-bold">Basic Terminal</h1>
 
-                <div className="flex flex-col gap-2">
-                    {/* [A, [B, C, [D, E]]] */}
-                    {history.map((item, i) => {
-                        if (typeof item != "string") {
-                            return item.map((h, j) => {
-                                return <p key={j}>{h}</p>;
-                            });
-                        } else {
-                            return <p key={i}>{item}</p>;
-                        }
-                    })}
-                </div>
+                <div className="flex flex-col gap-2">{renderTree(0, 0)}</div>
 
                 <div className="flex">
                     <p className="font-bold">@</p>
