@@ -10,14 +10,14 @@ export default function Terminal({
     inputSize: number;
 }) {
     const [input, setInput] = useState("");
-    const [folder, setFolder] = useState<string[]>([]);
-    const [history, setHistory] = useState<string[]>([]);
+    const [folder, setFolder] = useState<any>([]);
+    const [history, setHistory] = useState<any>([]);
 
     useEffect(() => {
         const folders = [];
-        let ascii = 65;
         for (let i = 0; i < inputSize; i++) {
-            folders.push("Folder " + String.fromCharCode(ascii++));
+            const randomAscii = Math.floor(Math.random() * (90 - 65 + 1)) + 65;
+            folders.push("Folder " + String.fromCharCode(randomAscii));
         }
 
         setFolder(folders);
@@ -26,7 +26,15 @@ export default function Terminal({
     function executeCommand() {
         switch (input) {
             case "list":
-                setHistory(folder);
+                setHistory(folder)
+                break;
+
+            case "sort_recursive":
+                setFolder(sortRecursive(treeAsArray(folder)).flat())
+                break;
+
+            case "sort_iterative":
+                setFolder(sortIterative(treeAsArray(folder)).flat())
                 break;
 
             default:
@@ -39,16 +47,56 @@ export default function Terminal({
     function renderTree(index: number, depth: number) {
         if (index >= history.length) return null;
 
-        const children = Array.from({length: settings.childCount}, (_, n) => settings.childCount * index + (n + 1));
+        const children = Array.from(
+            { length: settings.childCount },
+            (_, n) => settings.childCount * index + (n + 1)
+        );
 
         return (
             <React.Fragment key={index}>
                 <p style={{ paddingLeft: 32 * depth }}>{history[index]}</p>
-                {children.map(childIndex => (
+                {children.map((childIndex) =>
                     renderTree(childIndex, depth + 1)
-                ))}
+                )}
             </React.Fragment>
         );
+    }
+
+    function treeAsArray(arr: string[]) {
+        const result: (string | string[])[] = [arr[0]];
+
+        for (let i = 1; i < arr.length; i += settings.childCount) {
+            const pair = arr.slice(i, i + settings.childCount);
+            result.push(pair);
+        }
+
+        return result;
+    }
+
+    function sortRecursive(arr: (string | string[])[]): any {
+        return arr.map((item) => {
+            if (Array.isArray(item)) {
+                return [...item].sort((a, b) =>
+                    String(a).localeCompare(String(b))
+                );
+            }
+
+            return item;
+        });
+    }
+
+    function sortIterative(arr: (string | string[])[]): any {
+        const result = [...arr];
+
+        for (let i = 0; i < result.length; i++) {
+            const item = result[i];
+            if (Array.isArray(item)) {
+                result[i] = [...item].sort((a, b) =>
+                    String(a).localeCompare(String(b))
+                );
+            }
+        }
+        return result;
     }
 
     return (

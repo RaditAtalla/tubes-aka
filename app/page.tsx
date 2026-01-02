@@ -36,10 +36,10 @@ export default function Home() {
                             <i>print a list of all folder at root level</i>
                         </li>
                         <li>
-                            sortDesc - <i>sort the list in descending order</i>
+                            sort_iterative - <i>sort the list by name iteratively</i>
                         </li>
                         <li>
-                            sortAsc - <i>sort the list in ascending order</i>
+                            sort_recursive - <i>sort the list by name recursive</i>
                         </li>
                     </ul>
                 </div>
